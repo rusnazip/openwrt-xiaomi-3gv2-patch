@@ -1,0 +1,201 @@
+diff --git a/target/linux/ramips/base-files/etc/board.d/02_network b/target/linux/ramips/base-files/etc/board.d/02_network
+index 27f85d7458..2b166dd944 100755
+--- a/target/linux/ramips/base-files/etc/board.d/02_network
++++ b/target/linux/ramips/base-files/etc/board.d/02_network
+@@ -469,6 +469,10 @@  ramips_setup_interfaces()
+ 		ucidef_add_switch "switch0" \
+ 			"2:lan:2" "3:lan:1" "1:wan" "6t@eth0"
+ 		;;
++	xiaomi,mir3g-v2)
++		ucidef_add_switch "switch0" \
++			"2:lan:2" "3:lan:1" "4:wan" "6t@eth0"
++		;;
+ 	xiaomi,mir3p)
+ 		ucidef_add_switch "switch0" \
+ 			"1:lan:3" "2:lan:2" "3:lan:1" "4:wan" "6@eth0"
+@@ -683,6 +687,9 @@  ramips_setup_macs()
+ 	xiaomi,mir3p)
+ 		lan_mac=$(mtd_get_mac_binary factory 0xe006)
+ 		;;
++	xiaomi,mir3g-v2)
++		wan_mac=$(mtd_get_mac_binary factory 0xe006)
++		;;
+ 	xiaomi,miwifi-mini)
+ 		lan_mac=$(macaddr_setbit_la "$(cat /sys/class/net/eth0/address)")
+ 		;;
+diff --git a/target/linux/ramips/dts/mt7621_xiaomi_mir3g-v2.dts b/target/linux/ramips/dts/mt7621_xiaomi_mir3g-v2.dts
+new file mode 100644
+index 0000000000..58da88a862
+--- /dev/null
++++ b/target/linux/ramips/dts/mt7621_xiaomi_mir3g-v2.dts
+@@ -0,0 +1,147 @@ 
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/dts-v1/;
++
++#include "mt7621.dtsi"
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++
++/ {
++	compatible = "xiaomi,mir3g-v2", "mediatek,mt7621-soc";
++	model = "Xiaomi Mi Router 3G v2";
++
++	aliases {
++		led-boot = &led_status_yellow;
++		led-failsafe = &led_status_yellow;
++		led-running = &led_status_blue;
++		led-upgrade = &led_status_yellow;
++	};
++
++	chosen {
++		bootargs = "console=ttyS0,115200n8";
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		led_status_blue: status_blue {
++			label = "mir3gv2:blue:status";
++			gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
++		};
++
++		led_status_yellow: status_yellow {
++			label = "mir3gv2:yellow:status";
++			gpios = <&gpio0 10 GPIO_ACTIVE_LOW>;
++		};
++	};
++
++	button {
++		compatible = "gpio-keys";
++
++		reset {
++			label = "reset";
++			gpios = <&gpio0 18 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_RESTART>;
++		};
++	};
++};
++
++&spi0 {
++	status = "okay";
++
++	m25p80@0 {
++		compatible = "jedec,spi-nor";
++		reg = <0>;
++		spi-max-frequency = <80000000>;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "u-boot";
++				reg = <0x0 0x30000>;
++				read-only;
++			};
++
++			partition@30000 {
++				label = "u-boot-env";
++				reg = <0x30000 0x10000>;
++				read-only;
++			};
++
++			partition@40000 {
++				label = "Bdata";
++				reg = <0x40000 0x10000>;
++				read-only;
++			};
++
++			factory: partition@50000 {
++				label = "factory";
++				reg = <0x50000 0x10000>;
++				read-only;
++			};
++
++			partition@60000 {
++				label = "crash";
++				reg = <0x60000 0x10000>;
++				read-only;
++			};
++
++			partition@70000 {
++				label = "cfg_bak";
++				reg = <0x70000 0x10000>;
++				read-only;
++			};
++
++			partition@80000 {
++				label = "overlay";
++				reg = <0x80000 0x100000>;
++				read-only;
++			};
++
++			firmware: partition@180000 {
++				compatible = "denx,uimage";
++				label = "firmware";
++				reg = <0x180000 0xe80000>;
++			};
++		};
++	};
++};
++
++&pcie {
++	status = "okay";
++};
++
++&pcie0 {
++	wifi@0,0 {
++		compatible = "pci14c3,7662";
++		reg = <0x0000 0 0 0 0>;
++		mediatek,mtd-eeprom = <&factory 0x8000>;
++		ieee80211-freq-limit = <5000000 6000000>;
++	};
++};
++
++&pcie1 {
++	wifi@0,0 {
++		compatible = "pci14c3,7603";
++		reg = <0x0000 0 0 0 0>;
++		mediatek,mtd-eeprom = <&factory 0x0000>;
++		ieee80211-freq-limit = <2400000 2500000>;
++	};
++};
++
++&ethernet {
++	mtd-mac-address = <&factory 0xe000>;
++	mediatek,portmap = "lllwl";
++};
++
++&pinctrl {
++	state_default: pinctrl0 {
++		gpio {
++			ralink,group = "jtag", "uart2", "uart3", "wdt";
++			ralink,function = "gpio";
++		};
++	};
++};
+diff --git a/target/linux/ramips/image/mt7621.mk b/target/linux/ramips/image/mt7621.mk
+index 5dc8efe7c5..10aa92a88c 100644
+--- a/target/linux/ramips/image/mt7621.mk
++++ b/target/linux/ramips/image/mt7621.mk
+@@ -665,6 +665,18 @@  define Device/xiaomi_mir3g
+ endef
+ TARGET_DEVICES += xiaomi_mir3g
+ 
++define Device/xiaomi_mir3g-v2
++  MTK_SOC := mt7621
++  IMAGE_SIZE := 14848k
++  DEVICE_VENDOR := Xiaomi
++  DEVICE_MODEL := Mi Router 3G
++  DEVICE_VARIANT := v2
++  DEVICE_ALT0_VENDOR := Xiaomi
++  DEVICE_ALT0_MODEL := Mi Router 4A Gigabit Edition
++  DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x2 wpad-basic
++endef
++TARGET_DEVICES += xiaomi_mir3g-v2
++
+ define Device/xiaomi_mir3p
+   MTK_SOC := mt7621
+   BLOCKSIZE := 128k
