@@ -182,7 +182,7 @@ index 5dc8efe7c5..10aa92a88c 100644
 +++ b/target/linux/ramips/image/mt7621.mk
 @@ -665,6 +665,18 @@  define Device/xiaomi_mir3g
  endef
- TARGET_DEVICES += xiaomi_mir3g
+ TARGET_DEVICES += xiaomi_mir3p
  
 +define Device/xiaomi_mir3g-v2
 +  MTK_SOC := mt7621
@@ -196,6 +196,6 @@ index 5dc8efe7c5..10aa92a88c 100644
 +endef
 +TARGET_DEVICES += xiaomi_mir3g-v2
 +
- define Device/xiaomi_mir3p
-   MTK_SOC := mt7621
-   BLOCKSIZE := 128k
+ define Device/xiaomi_mir3g
+  DTS := MIR3G
+  BLOCKSIZE := 128k
