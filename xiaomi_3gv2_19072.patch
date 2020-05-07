@@ -17,7 +17,10 @@ index 27f85d7458..2b166dd944 100755
  	wlr-6000)
  		wan_mac=$(macaddr_add "$(mtd_get_mac_binary factory 32772)" 2)
  		;;
-+	xiaomi,mir3g-v2|\
++	xiaomi,mir3g-v2)
++		lan_mac=$(mtd_get_mac_binary Factory 0xe006)
++		label_mac=$wan_mac
++		;;
  	xiaomi,mir3g|\
  	xiaomi,mir3p)
  		lan_mac=$(mtd_get_mac_binary Factory 0xe006)
@@ -167,7 +170,7 @@ diff --git a/target/linux/ramips/dts/MIR3Gv2.dts b/target/linux/ramips/dts/MIR3G
 +&pinctrl {
 +	state_default: pinctrl0 {
 +		gpio {
-+			ralink,group = "jtag", "uart2", "uart3", "wdt";
++			ralink,group = "i2c";
 +			ralink,function = "gpio";
 +		};
 +	};
@@ -186,7 +189,7 @@ diff --git a/target/linux/ramips/image/mt7621.mk b/target/linux/ramips/image/mt7
 +  DEVICE_VENDOR := Xiaomi
 +  DEVICE_MODEL := Mi Router 3Gv2
 +  DEVICE_TITLE := Xiaomi Mi Router 3G v2
-+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x2 wpad-basic uboot-envtools
++  DEVICE_PACKAGES := kmod-mt7603 kmod-mt76x2 wpad-basic
 +endef
 +TARGET_DEVICES += xiaomi_mir3g-v2
 +
