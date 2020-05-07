@@ -188,7 +188,7 @@ index 5dc8efe7c5..10aa92a88c 100644
 +  MTK_SOC := mt7621
 +  IMAGE_SIZE := 14848k
 +  DEVICE_VENDOR := Xiaomi
-+  DEVICE_MODEL := Mi Router 3G
++  DEVICE_MODEL := Mi Router 3Gv2
 +  DEVICE_VARIANT := v2
 +  DEVICE_ALT0_VENDOR := Xiaomi
 +  DEVICE_ALT0_MODEL := Mi Router 4A Gigabit Edition
