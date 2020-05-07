@@ -2,32 +2,25 @@ diff --git a/target/linux/ramips/base-files/etc/board.d/02_network b/target/linu
 index 27f85d7458..2b166dd944 100755
 --- a/target/linux/ramips/base-files/etc/board.d/02_network
 +++ b/target/linux/ramips/base-files/etc/board.d/02_network
-@@ -469,6 +469,10 @@  ramips_setup_interfaces()
+@@ -459,6 +459,7 @@
+ 		ucidef_add_switch "switch0" \
+ 			"4:lan" "0:wan" "6@eth0"
+ 		;;
++	xiaomi,mir3g-v2|\
+ 	xiaomi,mir3g)
  		ucidef_add_switch "switch0" \
  			"2:lan:2" "3:lan:1" "1:wan" "6t@eth0"
+@@ -683,6 +683,7 @@
+ 	wlr-6000)
+ 		wan_mac=$(macaddr_add "$(mtd_get_mac_binary factory 32772)" 2)
  		;;
-+	xiaomi,mir3g-v2)
-+		ucidef_add_switch "switch0" \
-+			"2:lan:2" "3:lan:1" "4:wan" "6t@eth0"
-+		;;
++	xiaomi,mir3g-v2|\
+ 	xiaomi,mir3g|\
  	xiaomi,mir3p)
- 		ucidef_add_switch "switch0" \
- 			"1:lan:3" "2:lan:2" "3:lan:1" "4:wan" "6@eth0"
-@@ -683,6 +687,9 @@  ramips_setup_macs()
- 	xiaomi,mir3p)
- 		lan_mac=$(mtd_get_mac_binary factory 0xe006)
- 		;;
-+	xiaomi,mir3g-v2)
-+		wan_mac=$(mtd_get_mac_binary factory 0xe006)
-+		;;
- 	zyxel,keenetic-start)
- 		wan_mac=$(mtd_get_mac_binary factory 40)
- 		;;
-diff --git a/target/linux/ramips/dts/mt7621_xiaomi_mir3g-v2.dts b/target/linux/ramips/dts/mt7621_xiaomi_mir3g-v2.dts
-new file mode 100644
-index 0000000000..58da88a862
+ 		lan_mac=$(mtd_get_mac_binary Factory 0xe006)
+diff --git a/target/linux/ramips/dts/MIR3Gv2.dts b/target/linux/ramips/dts/MIR3Gv2.dts
 --- /dev/null
-+++ b/target/linux/ramips/dts/mt7621_xiaomi_mir3g-v2.dts
++++ b/target/linux/ramips/dts/MIR3Gv2.dts
 @@ -0,0 +1,147 @@ 
 +// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 +/dts-v1/;
@@ -177,14 +170,14 @@ index 0000000000..58da88a862
 +	};
 +};
 diff --git a/target/linux/ramips/image/mt7621.mk b/target/linux/ramips/image/mt7621.mk
-index 5dc8efe7c5..10aa92a88c 100644
 --- a/target/linux/ramips/image/mt7621.mk
 +++ b/target/linux/ramips/image/mt7621.mk
-@@ -665,6 +665,18 @@  define Device/xiaomi_mir3g
+@@ -665,6 +665,16 @@
  endef
  TARGET_DEVICES += xiaomi_mir3p
  
-+define Device/iaomi_mir3g-v2
++define Device/xiaomi_mir3g-v2
++  DTS := MIR3Gv2
 +  MTK_SOC := mt7621
 +  IMAGE_SIZE := 13312k
 +  DEVICE_VENDOR := Xiaomi
