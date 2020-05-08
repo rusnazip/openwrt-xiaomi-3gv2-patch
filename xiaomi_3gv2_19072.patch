@@ -1,5 +1,4 @@
 diff --git a/target/linux/ramips/base-files/etc/board.d/02_network b/target/linux/ramips/base-files/etc/board.d/02_network
-index 27f85d7458..2b166dd944 100755
 --- a/target/linux/ramips/base-files/etc/board.d/02_network
 +++ b/target/linux/ramips/base-files/etc/board.d/02_network
 @@ -459,6 +459,10 @@
