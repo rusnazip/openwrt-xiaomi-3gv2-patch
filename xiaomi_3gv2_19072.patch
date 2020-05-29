@@ -12,7 +12,7 @@ diff --git a/target/linux/ramips/base-files/etc/board.d/02_network b/target/linu
  	xiaomi,mir3g)
  		ucidef_add_switch "switch0" \
  			"2:lan:2" "3:lan:1" "1:wan" "6t@eth0"
-@@ -683,6 +683,7 @@
+@@ -684,6 +684,10 @@
  	wlr-6000)
  		wan_mac=$(macaddr_add "$(mtd_get_mac_binary factory 32772)" 2)
  		;;
